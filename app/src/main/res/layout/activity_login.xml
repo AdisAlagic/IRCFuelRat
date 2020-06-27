@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Login">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/fuel_rats_logo_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_line_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.17" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_line_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.83" />
+
+    <EditText
+        android:id="@+id/login"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:hint="Ник"
+        app:layout_constraintEnd_toEndOf="@id/guide_line_right"
+        app:layout_constraintStart_toStartOf="@id/guide_line_left"
+        app:layout_constraintTop_toBottomOf="@id/logo"
+        android:importantForAutofill="no"
+        android:inputType="text" />
+
+    <EditText
+        android:hint="Пароль (необязательно)"
+        android:layout_width="0dp"
+        android:id="@+id/password"
+        android:inputType="textPassword"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/guide_line_left"
+        app:layout_constraintEnd_toEndOf="@id/guide_line_right"
+        app:layout_constraintTop_toBottomOf="@id/login"
+        android:layout_marginTop="20dp"
+        android:importantForAutofill="no" />
+
+    <CheckBox
+        android:id="@+id/remember"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/guide_line_left"
+        app:layout_constraintTop_toBottomOf="@id/password"
+        android:text="Запомнить меня"
+        android:layout_marginTop="20dp" />
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/guide_line_left"
+        app:layout_constraintEnd_toEndOf="@id/guide_line_right"
+        app:layout_constraintTop_toBottomOf="@id/remember"
+        android:layout_marginTop="20dp"
+        android:onClick="onSubmitClick"
+        android:text="Войти" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

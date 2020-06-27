@@ -15,5 +15,10 @@
         android:name="com.adisalagic.fuelratsirc.ui.fuelrats.FuelRats"
         android:label="fuel_rats_fragment"
         tools:layout="@layout/fuel_rats_fragment" />
+    <activity
+        android:id="@+id/login"
+        android:name="com.adisalagic.fuelratsirc.Login"
+        android:label="activity_login"
+        tools:layout="@layout/activity_login" />
 
 </navigation>
