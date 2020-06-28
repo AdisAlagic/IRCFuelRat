@@ -9,7 +9,14 @@
             android:title="@string/menu_home" />
         <item
             android:id="@+id/nav_fuelrats"
-            android:title="#FuelRats"/>
-
+            android:title="@string/fuelrats"/>
+    </group>
+    <group android:checkableBehavior="single">
+        <item android:title="@string/system">
+            <menu>
+                <item android:id="@+id/exit"
+                    android:title="@string/disconnect"/>
+            </menu>
+        </item>
     </group>
 </menu>

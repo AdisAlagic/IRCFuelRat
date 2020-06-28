@@ -6,17 +6,22 @@ import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.ListenerAdapter;
+import org.pircbotx.hooks.types.GenericMessageEvent;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class IRClient {
 
     private static volatile IRClient mInstance;
+    public static String RAT_CHAT = "#ratchat";
 
     PircBotX      botX;
     Configuration configuration;
     String        login;
     String        password;
+
+    public ArrayList<GenericMessageEvent> events = new ArrayList<>();
 
     private IRClient() {
     }
@@ -49,7 +54,7 @@ public class IRClient {
         Configuration.Builder builder = new Configuration.Builder();
         builder
                 .addServer("irc.fuelrats.com")
-                .addAutoJoinChannel("#ratchat")
+                .addAutoJoinChannel(RAT_CHAT)
                 .addListener(adapter)
                 .setName(login)
                 .setAutoReconnect(true)
@@ -60,6 +65,10 @@ public class IRClient {
             builder.setNickservNick(password);
         }
         configuration = builder.buildConfiguration();
+    }
+
+    public String getLogin() {
+        return login;
     }
 
     public Configuration getConfiguration() {

@@ -69,7 +69,7 @@ public class IRCTextSender extends ConstraintLayout {
 
             @Override
             public void onTextTyped(String typedText) {
-                typedMessage = typedText;
+
             }
         };
         caseNum.setOnClickListener(new OnClickListener() {
@@ -108,6 +108,7 @@ public class IRCTextSender extends ConstraintLayout {
 
             @Override
             public void afterTextChanged(Editable s) {
+                typedMessage = s.toString();
                 handler.onTextTyped(s.toString());
             }
         });
@@ -115,8 +116,8 @@ public class IRCTextSender extends ConstraintLayout {
         shortComds.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Activity           activity = (Activity) v.getContext();
-                final PopupWindow window = new PopupWindow(v.getContext());
+                Activity          activity = (Activity) v.getContext();
+                final PopupWindow window   = new PopupWindow(v.getContext());
                 window.setFocusable(true);
                 View                      windowView  = inflate(v.getContext(), R.layout.popup_checkboxes, null);
                 LinearLayout              layout      = windowView.findViewById(R.id.lay);
@@ -140,7 +141,7 @@ public class IRCTextSender extends ConstraintLayout {
                                         .append(" ");
                             }
                         }
-                        if (!typedMessage.isEmpty()){
+                        if (!typedMessage.isEmpty()) {
                             mesg.append(typedMessage);
                         }
                         message.setText(mesg);
@@ -150,7 +151,7 @@ public class IRCTextSender extends ConstraintLayout {
                 layout.addView(add);
                 window.setContentView(windowView);
 
-                InputMethodManager imm      = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (imm != null && activity.getCurrentFocus() != null) {
                     imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
                 }
@@ -163,7 +164,7 @@ public class IRCTextSender extends ConstraintLayout {
             public void onClick(View v) {
                 String msg = "";
                 if (!caseNum.getText().toString().isEmpty()) {
-                    if (!caseNum.getText().toString().equals("#")){
+                    if (!caseNum.getText().toString().equals("#")) {
                         msg += "#" + caseNum.getText().toString();
                     }
                 }
@@ -192,9 +193,16 @@ public class IRCTextSender extends ConstraintLayout {
 
     //TODO Make color change for text on selected text
 
-    interface Handler {
+    public interface Handler {
         void onSendButtonClicked(View v, String message);
 
         void onTextTyped(String typedText);
+    }
+
+    public void setEnabled(boolean enabled) {
+        shortComds.setEnabled(enabled);
+        caseNum.setEnabled(enabled);
+        sendButton.setEnabled(enabled);
+        message.setEnabled(enabled);
     }
 }
