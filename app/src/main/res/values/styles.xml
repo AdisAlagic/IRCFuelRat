@@ -16,7 +16,7 @@
 
     <style name="black" parent="Theme.AppCompat.DayNight">
         <item name="android:colorBackground">#000</item>
-        <item name="backgroundColor">#000</item>
+<!--        <item name="backgroundColor">#000</item>-->
     </style>
 
     <style name="black_nobar" parent="black">

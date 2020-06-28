@@ -16,10 +16,10 @@ public class IRClient {
     private static volatile IRClient mInstance;
     public static String RAT_CHAT = "#ratchat";
 
-    PircBotX      botX;
-    Configuration configuration;
-    String        login;
-    String        password;
+    private PircBotX      botX;
+    private Configuration configuration;
+    private String        login;
+    private String        password;
 
     public ArrayList<GenericMessageEvent> events = new ArrayList<>();
 

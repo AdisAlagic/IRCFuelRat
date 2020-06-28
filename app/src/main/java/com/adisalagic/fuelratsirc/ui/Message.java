@@ -60,7 +60,7 @@ public class Message extends Fragment {
         Spanned coloredAuthor = colorizeMessage();
         mFullMessage.setText(coloredAuthor);
         if (colored) {
-            mFullMessage.setBackgroundColor(Color.DKGRAY);
+            mFullMessage.setBackgroundColor(Color.parseColor("#191919"));
         }
         rootView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

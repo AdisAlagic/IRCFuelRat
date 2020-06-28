@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
+import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -42,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         DrawerLayout   drawer         = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+        TextView textView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.login);
+        textView.setText(IRClient.getInstance().getLogin());
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -83,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+        toolbar.setPopupTheme(R.style.black_nobar);
+
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("START_SERVICE"));
