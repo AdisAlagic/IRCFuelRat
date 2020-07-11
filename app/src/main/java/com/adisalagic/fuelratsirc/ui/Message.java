@@ -32,14 +32,12 @@ public class Message extends Fragment {
     String  author;
     View    rootView;
     String  authorColor;
-    boolean colored;
     UUID uuid;
     private TextView mFullMessage;
 
-    public Message(String message, String author, boolean colored, UUID uuid) {
+    public Message(String message, String author, UUID uuid) {
         this.message = message;
         this.author = author;
-        this.colored = colored;
         this.uuid = uuid;
         Random random = new Random(UuidToLong());
         int r = random.nextInt(255);
@@ -59,13 +57,10 @@ public class Message extends Fragment {
         mFullMessage = rootView.findViewById(R.id.full_message);
         Spanned coloredAuthor = colorizeMessage();
         mFullMessage.setText(coloredAuthor);
-        if (colored) {
-            mFullMessage.setBackgroundColor(Color.parseColor("#191919"));
-        }
         rootView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                ClipboardManager clipboardManager = (ClipboardManager) ((Activity) v.getContext()).getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipboardManager clipboardManager = (ClipboardManager) v.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clipData = ClipData.newPlainText("message", message);
                 clipboardManager.setPrimaryClip(clipData);
                 Toast.makeText(v.getContext(), "Copped to clipboard", Toast.LENGTH_SHORT).show();

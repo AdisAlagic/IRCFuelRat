@@ -39,7 +39,6 @@ public class FuelRats extends Fragment {
     private ScrollView    mScrollView;
     private IRCTextSender mSender;
     private View          rootView;
-    private boolean colored = false;
     private boolean collectMode = false;
     FragmentManager manager;
 
@@ -56,9 +55,8 @@ public class FuelRats extends Fragment {
                 IRClient.getInstance().events.add(event);
             }
             FragmentTransaction transaction = manager.beginTransaction();
-            transaction.add(mChat.getId(), new Message(event.getMessage(), event.getUserHostmask().getNick(), colored, event.getUser().getUserId()));
+            transaction.add(mChat.getId(), new Message(event.getMessage(), event.getUserHostmask().getNick(), event.getUser().getUserId()));
             transaction.commit();
-            colored = !colored;
             ((Activity) rootView.getContext()).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -127,10 +125,9 @@ public class FuelRats extends Fragment {
                             public void run() {
                                 mScrollView.fullScroll(View.FOCUS_DOWN);
                                 FragmentTransaction transaction = manager.beginTransaction();
-                                transaction.add(mChat.getId(), new Message(message, IRClient.getInstance().getLogin(), colored,
+                                transaction.add(mChat.getId(), new Message(message, IRClient.getInstance().getLogin(),
                                         IRClient.getInstance().getBotX().getUserBot().getUserId()));
                                 transaction.commit();
-                                colored = !colored;
                                 mScrollView.fullScroll(View.FOCUS_DOWN);
                             }
                         });
@@ -171,10 +168,9 @@ public class FuelRats extends Fragment {
         }
         FragmentTransaction transaction = manager.beginTransaction();
         for (GenericMessageEvent event : IRClient.getInstance().events){
-            Message msg = new Message(event.getMessage(), event.getUserHostmask().getNick(), colored,
+            Message msg = new Message(event.getMessage(), event.getUserHostmask().getNick(),
                     event.getUser().getUserId());
             transaction.add(mChat.getId(), msg);
-            colored = !colored;
         }
         transaction.commit();
         IRClient.getInstance().events.clear();
@@ -183,9 +179,8 @@ public class FuelRats extends Fragment {
     private void addSystemMessage(String message){
         FragmentTransaction transaction = manager.beginTransaction();
         UUID uuid = UUID.fromString("8d28ed28-9d1b-4e49-adb8-9555911d59a6"); //Let System will have one color
-        Message msg = new Message(message, "System", colored, uuid);
+        Message msg = new Message(message, "System", uuid);
         transaction.add(mChat.getId(), msg);
         transaction.commit();
-        colored = !colored;
     }
 }

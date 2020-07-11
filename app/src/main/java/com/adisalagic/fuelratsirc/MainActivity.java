@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         DrawerLayout   drawer         = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
-        TextView textView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.login);
+        TextView textView = navigationView.getHeaderView(0).findViewById(R.id.login);
         textView.setText(IRClient.getInstance().getLogin());
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
