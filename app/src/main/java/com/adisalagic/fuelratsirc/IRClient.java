@@ -15,8 +15,9 @@ import java.util.ArrayList;
 public class IRClient {
 
     private static volatile IRClient mInstance;
-    public static String RAT_CHAT = "#ratchat";
+    public static           String   RAT_CHAT = "#ratchat";
 
+    private IRCAdapter    adapter;
     private PircBotX      botX;
     private Configuration configuration;
     private String        login;
@@ -25,6 +26,7 @@ public class IRClient {
     public ArrayList<GenericMessageEvent> events = new ArrayList<>();
 
     private IRClient() {
+        adapter = new IRCAdapter();
     }
 
     public static IRClient getInstance() {
@@ -51,7 +53,7 @@ public class IRClient {
         setPassword(password);
     }
 
-    public void buildConfiguration(ListenerAdapter adapter) {
+    public void buildConfiguration() {
         Configuration.Builder builder = new Configuration.Builder();
         builder
                 .addServer("irc.fuelrats.com")
@@ -95,5 +97,9 @@ public class IRClient {
 
     public PircBotX getBotX() {
         return botX;
+    }
+
+    public IRCAdapter getAdapter() {
+        return adapter;
     }
 }

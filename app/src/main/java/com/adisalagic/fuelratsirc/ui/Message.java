@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,7 @@ public class Message extends Fragment {
     String  authorColor;
     UUID uuid;
     private TextView mFullMessage;
+    private boolean isSystem = false;
 
     public Message(String message, String author, UUID uuid) {
         this.message = message;
@@ -48,6 +50,11 @@ public class Message extends Fragment {
 //        authorColor = Color.rgb(r, g, b);
     }
 
+    public Message(String message){
+        this.message = message;
+        isSystem = true;
+    }
+
     @SuppressLint("SetTextI18n")
     @Nullable
     @Override
@@ -55,18 +62,23 @@ public class Message extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         rootView = inflater.inflate(R.layout.fragment_message, null);
         mFullMessage = rootView.findViewById(R.id.full_message);
-        Spanned coloredAuthor = colorizeMessage();
-        mFullMessage.setText(coloredAuthor);
-        rootView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                ClipboardManager clipboardManager = (ClipboardManager) v.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clipData = ClipData.newPlainText("message", message);
-                clipboardManager.setPrimaryClip(clipData);
-                Toast.makeText(v.getContext(), "Copped to clipboard", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });
+        mFullMessage.setMovementMethod(LinkMovementMethod.getInstance());
+        if (isSystem){
+            mFullMessage.setText(message);
+        }else {
+            Spanned coloredAuthor = colorizeMessage();
+            mFullMessage.setText(coloredAuthor);
+            rootView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    ClipboardManager clipboardManager = (ClipboardManager) v.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clipData = ClipData.newPlainText("message", message);
+                    clipboardManager.setPrimaryClip(clipData);
+                    Toast.makeText(v.getContext(), "Copped to clipboard", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
+        }
 
 
         return rootView;
@@ -102,4 +114,7 @@ public class Message extends Fragment {
         return val;
     }
 
+    public View getRootView() {
+        return rootView;
+    }
 }

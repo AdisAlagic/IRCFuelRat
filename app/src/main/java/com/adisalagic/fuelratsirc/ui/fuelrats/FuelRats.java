@@ -19,6 +19,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.adisalagic.fuelratsirc.IRCAdapter;
 import com.adisalagic.fuelratsirc.IRCTextSender;
 import com.adisalagic.fuelratsirc.IRClient;
 import com.adisalagic.fuelratsirc.R;
@@ -29,8 +30,10 @@ import org.pircbotx.hooks.events.ConnectAttemptFailedEvent;
 import org.pircbotx.hooks.events.ConnectEvent;
 import org.pircbotx.hooks.events.DisconnectEvent;
 import org.pircbotx.hooks.events.JoinEvent;
+import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.types.GenericMessageEvent;
 
+import java.util.List;
 import java.util.UUID;
 
 public class FuelRats extends Fragment {
@@ -39,50 +42,46 @@ public class FuelRats extends Fragment {
     private ScrollView    mScrollView;
     private IRCTextSender mSender;
     private View          rootView;
-    private boolean collectMode = false;
+    private boolean       collectMode = false;
     FragmentManager manager;
 
     public static FuelRats newInstance() {
         return new FuelRats();
     }
 
-    ListenerAdapter adapter = new ListenerAdapter() {
+    final IRCAdapter.Sublistener adapter = new IRCAdapter.Sublistener() {
         @Override
-        public void onGenericMessage(GenericMessageEvent event) throws Exception {
-            super.onGenericMessage(event);
-            Log.i("IRCConnection", event.getMessage());
-            if (collectMode){
-                IRClient.getInstance().events.add(event);
-            }
-            FragmentTransaction transaction = manager.beginTransaction();
-            transaction.add(mChat.getId(), new Message(event.getMessage(), event.getUserHostmask().getNick(), event.getUser().getUserId()));
-            transaction.commit();
-            ((Activity) rootView.getContext()).runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mScrollView.fullScroll(View.FOCUS_DOWN);
-                    mScrollView.fullScroll(View.FOCUS_DOWN);
-                }
-            });
+        public void onGenericMessage(GenericMessageEvent event) {
+
         }
 
         @Override
-        public void onDisconnect(DisconnectEvent event) throws Exception {
-            super.onDisconnect(event);
+        public void onMessageEvent(MessageEvent event) {
+            Log.i("IRCConnection", event.getMessage());
+            if (collectMode) {
+                IRClient.getInstance().events.add(event);
+            }
+            FragmentTransaction transaction = manager.beginTransaction();
+            Message message = new Message(event.getMessage(), event.getUserHostmask().getNick(), event.getUser().getUserId());
+            transaction.add(mChat.getId(), message);
+            transaction.commit();
+            scrollDown();
+        }
+
+        @Override
+        public void onDisconnect(DisconnectEvent event) {
             addSystemMessage("Disconnected!");
         }
 
         @Override
-        public void onJoin(JoinEvent event) throws Exception {
-            super.onJoin(event);
-            if (!event.getUserHostmask().getNick().equals(IRClient.getInstance().getBotX().getNick())){
-                addSystemMessage("User " + event.getUserHostmask().getNick() + "has connected");
+        public void onJoin(JoinEvent event) {
+            if (!event.getUserHostmask().getNick().equals(IRClient.getInstance().getBotX().getNick())) {
+                addSystemMessage("User " + event.getUserHostmask().getNick() + " has connected");
             }
         }
 
         @Override
-        public void onConnect(ConnectEvent event) throws Exception {
-            super.onConnect(event);
+        public void onConnect(ConnectEvent event) {
             addSystemMessage("Connection success!");
             ((Activity) rootView.getContext()).runOnUiThread(new Runnable() {
                 @Override
@@ -94,8 +93,7 @@ public class FuelRats extends Fragment {
 
 
         @Override
-        public void onConnectAttemptFailed(ConnectAttemptFailedEvent event) throws Exception {
-            super.onConnectAttemptFailed(event);
+        public void onConnectAttemptFailed(ConnectAttemptFailedEvent event) {
             addSystemMessage("Connection failed, attempts left: " + event.getRemainingAttempts());
         }
 
@@ -111,6 +109,9 @@ public class FuelRats extends Fragment {
         mScrollView = rootView.findViewById(R.id.scroller);
         mSender = rootView.findViewById(R.id.sender);
         manager = getChildFragmentManager();
+        IRCAdapter ircAdapter = IRClient.getInstance().getAdapter();
+        ircAdapter.addSublistener(adapter);
+        mScrollView.setSmoothScrollingEnabled(true);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         mSender.setEnabled(false);
         mSender.addHandler(new IRCTextSender.Handler() {
@@ -147,7 +148,7 @@ public class FuelRats extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        IRClient.getInstance().buildConfiguration(adapter);
+        IRClient.getInstance().buildConfiguration();
         addSystemMessage("Connecting...");
         Intent intent = new Intent("START_SERVICE");
         LocalBroadcastManager.getInstance(rootView.getContext()).sendBroadcast(intent);
@@ -163,11 +164,11 @@ public class FuelRats extends Fragment {
     public void onResume() {
         super.onResume();
         collectMode = false;
-        if (IRClient.getInstance().events.size() == 0){
+        if (IRClient.getInstance().events.size() == 0) {
             return;
         }
         FragmentTransaction transaction = manager.beginTransaction();
-        for (GenericMessageEvent event : IRClient.getInstance().events){
+        for (GenericMessageEvent event : IRClient.getInstance().events) {
             Message msg = new Message(event.getMessage(), event.getUserHostmask().getNick(),
                     event.getUser().getUserId());
             transaction.add(mChat.getId(), msg);
@@ -176,11 +177,22 @@ public class FuelRats extends Fragment {
         IRClient.getInstance().events.clear();
     }
 
-    private void addSystemMessage(String message){
+    private void addSystemMessage(String message) {
         FragmentTransaction transaction = manager.beginTransaction();
-        UUID uuid = UUID.fromString("8d28ed28-9d1b-4e49-adb8-9555911d59a6"); //Let System will have one color
-        Message msg = new Message(message, "System", uuid);
+        Message             msg         = new Message(message);
         transaction.add(mChat.getId(), msg);
         transaction.commit();
+        scrollDown();
     }
+
+    private void scrollDown(){
+        ((Activity) rootView.getContext()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mScrollView.fullScroll(View.FOCUS_DOWN);
+                mScrollView.fullScroll(View.FOCUS_DOWN);
+            }
+        });
+    }
+
 }
