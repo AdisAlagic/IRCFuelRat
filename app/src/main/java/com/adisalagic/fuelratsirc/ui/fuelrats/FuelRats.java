@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
@@ -25,6 +27,7 @@ import com.adisalagic.fuelratsirc.IRClient;
 import com.adisalagic.fuelratsirc.R;
 import com.adisalagic.fuelratsirc.ui.Message;
 
+import org.pircbotx.User;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.ConnectAttemptFailedEvent;
 import org.pircbotx.hooks.events.ConnectEvent;
@@ -33,6 +36,7 @@ import org.pircbotx.hooks.events.JoinEvent;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.types.GenericMessageEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,6 +47,7 @@ public class FuelRats extends Fragment {
     private IRCTextSender mSender;
     private View          rootView;
     private boolean       collectMode = false;
+    private User[]        users       = {};
     FragmentManager manager;
 
     public static FuelRats newInstance() {
@@ -62,10 +67,11 @@ public class FuelRats extends Fragment {
                 IRClient.getInstance().events.add(event);
             }
             FragmentTransaction transaction = manager.beginTransaction();
-            Message message = new Message(event.getMessage(), event.getUserHostmask().getNick(), event.getUser().getUserId());
+            Message             message     = new Message(event.getMessage(), event.getUserHostmask().getNick(), event.getUser().getUserId());
             transaction.add(mChat.getId(), message);
             transaction.commit();
             scrollDown();
+            users = (User[]) event.getChannel().getUsers().toArray();
         }
 
         @Override
@@ -138,9 +144,15 @@ public class FuelRats extends Fragment {
             }
 
             @Override
-            public void onTextTyped(String typedText) {
+            public ArrayList<String> onCollectPeopleOnline() {
+                ArrayList<String> arrayList = new ArrayList<>();
 
+                for (User user : users) {
+                    arrayList.add(user.getNick());
+                }
+                return arrayList;
             }
+
         });
         return rootView;
     }
@@ -185,7 +197,7 @@ public class FuelRats extends Fragment {
         scrollDown();
     }
 
-    private void scrollDown(){
+    private void scrollDown() {
         ((Activity) rootView.getContext()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -194,5 +206,6 @@ public class FuelRats extends Fragment {
             }
         });
     }
+
 
 }

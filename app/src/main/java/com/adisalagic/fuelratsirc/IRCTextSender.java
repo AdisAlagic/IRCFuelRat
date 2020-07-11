@@ -18,12 +18,19 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.google.common.collect.HashMultimap;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 public class IRCTextSender extends ConstraintLayout {
 
@@ -64,13 +71,13 @@ public class IRCTextSender extends ConstraintLayout {
             @Override
             public void onSendButtonClicked(View v, String msg) {
                 Toast.makeText(v.getContext(), msg, Toast.LENGTH_SHORT).show();
-
             }
 
             @Override
-            public void onTextTyped(String typedText) {
-
+            public ArrayList<String> onCollectPeopleOnline() {
+                return new ArrayList<>();
             }
+
         };
         caseNum.setOnClickListener(new OnClickListener() {
             @Override
@@ -109,7 +116,31 @@ public class IRCTextSender extends ConstraintLayout {
             @Override
             public void afterTextChanged(Editable s) {
                 typedMessage = s.toString();
-                handler.onTextTyped(s.toString());
+                PopupWindow popupWindow = new PopupWindow(rootView.getContext());
+                popupWindow.setWidth(message.getWidth());
+                LinearLayout layout = new LinearLayout(rootView.getContext());
+                ArrayList<String> online = handler.onCollectPeopleOnline();
+                ScrollView scrollView = new ScrollView(rootView.getContext());
+                String[] words = s.toString().split(" ");
+                for (final String word : words){
+                    if (word.matches("@[a-zA-Z!]+")){
+                        ArrayList<String> close = getTopNSimularWords(10, word.replace('@', ' '), (String[]) online.toArray());
+                        for (String sim : close){
+                            final TextView textView = new TextView(rootView.getContext());
+                            textView.setText(sim);
+                            textView.setOnClickListener(new OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    message.setText(typedMessage.replaceAll("@[a-zA-Z!]+", textView.getText().toString()));
+                                }
+                            });
+                            layout.addView(textView);
+                        }
+                    }
+                }
+                scrollView.addView(layout);
+                popupWindow.setContentView(scrollView);
+                popupWindow.showAtLocation(message, Gravity.CENTER, LinearLayout.LayoutParams.MATCH_PARENT, 1);
             }
         });
 
@@ -195,8 +226,7 @@ public class IRCTextSender extends ConstraintLayout {
 
     public interface Handler {
         void onSendButtonClicked(View v, String message);
-
-        void onTextTyped(String typedText);
+        ArrayList<String> onCollectPeopleOnline();
     }
 
     public void setEnabled(boolean enabled) {
@@ -204,5 +234,42 @@ public class IRCTextSender extends ConstraintLayout {
         caseNum.setEnabled(enabled);
         sendButton.setEnabled(enabled);
         message.setEnabled(enabled);
+
     }
+
+    private static int compareWithSimularSymbols(String a, String b){
+        a = a.toLowerCase();
+        b = b.toLowerCase();
+        char[] aArray = a.toCharArray();
+        char[] bArray = b.toCharArray();
+        int ok = 0;
+        for (char aCh : aArray){
+            for (char bCh : bArray){
+                if (aCh == bCh){
+                    ok++;
+                }
+            }
+        }
+        return ok;
+    }
+
+    //I need better algorithm
+    private static ArrayList<String> getTopNSimularWords(int N, String source, String[] words){
+        TreeMap<Integer, String> pairs = new TreeMap<>();
+        for (String word : words){
+            pairs.put(compareWithSimularSymbols(source, word), word);
+        }
+        ArrayList<String>             strings = new ArrayList<>();
+        NavigableMap<Integer, String> reverse = pairs.descendingMap();
+        int                           i       = 0;
+        for (Map.Entry<Integer, String> entry : reverse.entrySet()){
+            if (i == N){
+                break;
+            }
+            strings.add(entry.getValue());
+            i++;
+        }
+        return strings;
+    }
+
 }
